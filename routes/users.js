@@ -4,7 +4,7 @@ const {
   getUserById,
   createUser,
   editUserData,
-  editUserAvatar,
+  // editUserAvatar,
 } = require('../controllers/users');
 
 // возвращает всех пользователей
@@ -15,7 +15,7 @@ router.get('/:userId', getUserById);
 router.post('/', createUser);
 // PATCH /users/me — обновляет профиль
 router.patch('./me', editUserData);
-// PATCH /users/me/avatar — обновляет аватар
-router.patch('/me/avatar', editUserAvatar);
+// // PATCH /users/me/avatar — обновляет аватар
+// router.patch('/me/avatar', editUserAvatar);
 
 module.exports = router;
