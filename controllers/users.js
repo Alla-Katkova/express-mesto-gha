@@ -22,7 +22,7 @@ module.exports.getUsersFromDB = (req, res) => {
     .catch(() => res.status(500).send({ message: 'На сервере произошла ошибка' }));
 };
 
-//найти юзера по айди
+// найти юзера по айди
 module.exports.getUserById = (req, res) => {
   if (req.params.userId.length === 24) {
     User.findById(req.params.userId)
@@ -39,7 +39,7 @@ module.exports.getUserById = (req, res) => {
   }
 };
 
-//редактировать инфу юзера
+// редактировать инфу юзера
 module.exports.editUserInfo = (req, res) => {
   const { name, about } = req.body;
   if (req.user._id) {
@@ -57,7 +57,7 @@ module.exports.editUserInfo = (req, res) => {
   }
 };
 
-//редактировать аватар юзера
+// редактировать аватар юзера
 module.exports.editUserAvatar = (req, res) => {
   const { avatar } = req.body;
   if (req.user._id) {
