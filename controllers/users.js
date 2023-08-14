@@ -1,5 +1,6 @@
 const User = require('../models/user');
 
+// создать юзера
 module.exports.createUser = (req, res) => {
   const { name, about, avatar } = req.body;
 
@@ -14,12 +15,14 @@ module.exports.createUser = (req, res) => {
     });
 };
 
+// вывести список юзера
 module.exports.getUsersFromDB = (req, res) => {
   User.find({})
     .then((users) => res.send(users))
     .catch(() => res.status(500).send({ message: 'На сервере произошла ошибка' }));
 };
 
+//найти юзера по айди
 module.exports.getUserById = (req, res) => {
   if (req.params.userId.length === 24) {
     User.findById(req.params.userId)
@@ -36,6 +39,7 @@ module.exports.getUserById = (req, res) => {
   }
 };
 
+//редактировать инфу юзера
 module.exports.editUserInfo = (req, res) => {
   const { name, about } = req.body;
   if (req.user._id) {
@@ -53,6 +57,7 @@ module.exports.editUserInfo = (req, res) => {
   }
 };
 
+//редактировать аватар юзера
 module.exports.editUserAvatar = (req, res) => {
   const { avatar } = req.body;
   if (req.user._id) {
