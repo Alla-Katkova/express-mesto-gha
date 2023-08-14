@@ -4,11 +4,7 @@ module.exports.createCard = (req, res) => {
   const { name, link } = req.body;
   Card.create({ name, link, owner: req.user._id })
     .then((card) => {
-      //   Card.findById(card._id)
-      //     .populate('owner')
-      //     .then((data) => res.send(data))
-      //     .catch(() => res.status(404).send({ message: 'Карточка с указанным _id не найдена.' }))
-      res.status(201).send(card)
+      res.status(201).send(card);
     })
 
     .catch((err) => {
@@ -34,7 +30,7 @@ module.exports.deleteCard = (req, res) => {
           res.status(404).send({ message: 'Карточка с указанным _id не найдена.' });
           return;
         }
-        res.send({ message: 'Карточка успешно удалена.'});
+        res.send({ message: 'Карточка успешно удалена.' });
       })
       .catch(() => res.status(404).send({ message: 'Карточка с указанным _id не найдена.' }));
   } else {
@@ -42,3 +38,36 @@ module.exports.deleteCard = (req, res) => {
   }
 };
 
+module.exports.likeCard = (req, res) => {
+  if (req.params.cardId.length === 24) {
+    Card.findByIdAndUpdate(req.params.cardId, { $addToSet: { likes: req.user._id } }, { new: true })
+
+      .then((card) => {
+        if (!card) {
+          res.status(404).send({ message: 'Карточка с указанным _id не найдена.' });
+          return;
+        }
+        res.send(card);
+      })
+      .catch(() => res.status(404).send({ message: 'Карточка с указанным _id не найдена.' }));
+  } else {
+    res.status(400).send({ message: 'Переданы некорректные данные _id. ' });
+  }
+};
+
+module.exports.dislikeCard = (req, res) => {
+  if (req.params.cardId.length === 24) {
+    Card.findByIdAndUpdate(req.params.cardId, { $pull: { likes: req.user._id } }, { new: true })
+
+      .then((card) => {
+        if (!card) {
+          res.status(404).send({ message: 'Карточка с указанным _id не найдена.' });
+          return;
+        }
+        res.send(card);
+      })
+      .catch(() => res.status(404).send({ message: 'Карточка с указанным _id не найдена.' }));
+  } else {
+    res.status(400).send({ message: 'Переданы некорректные данные _id. ' });
+  }
+};
