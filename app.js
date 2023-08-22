@@ -23,7 +23,7 @@ mongoose.connect(DB_URL, {
 
 app.use((req, res, next) => {
   req.user = {
-    _id: '64d7daef2a91bb0b9e14fe26', // вставьте сюда _id созданного в предыдущем пункте пользователя
+    _id: '64e4efa4e067a30199a3b9aa', // вставьте сюда _id созданного в предыдущем пункте пользователя
   };
 
   next();
@@ -49,7 +49,7 @@ app.use((err, req, res, next) => {
         ? 'На сервере произошла ошибка'
         : message,
     });
-    next();
+  next();
 });
 
 app.listen(PORT);

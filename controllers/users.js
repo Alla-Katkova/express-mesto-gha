@@ -1,29 +1,31 @@
 const { default: mongoose } = require('mongoose');
 const User = require('../models/user');
+const NotFoundError = require('../errors/NotFoundError');
+const BadRequestError = require('../errors/BadRequestError');
 
 // создать юзера
-module.exports.createUser = (req, res) => {
+module.exports.createUser = (req, res, next) => {
   const { name, about, avatar } = req.body;
   User.create({ name, about, avatar })
     .then((user) => res.status(201).send(user))
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(400).send({ message: err.message });
+      if (err instanceof mongoose.Error.ValidationError) {
+        next(new BadRequestError(err.message));
       } else {
-        res.status(500).send({ message: 'На сервере произошла ошибка' });
+        next(err);
       }
     });
 };
 
 // вывести список юзера
-module.exports.getUsersFromDB = (req, res) => {
+module.exports.getUsersFromDB = (req, res, next) => {
   User.find({})
     .then((users) => res.send(users))
-    .catch(() => res.status(500).send({ message: 'На сервере произошла ошибка' }));
+    .catch(next);
 };
 
 // найти юзера по айди
-module.exports.getUserById = (req, res) => {
+module.exports.getUserById = (req, res, next) => {
   User.findById(req.params.userId)
     .orFail()
     .then((user) => {
@@ -31,47 +33,47 @@ module.exports.getUserById = (req, res) => {
     })
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
-        res.status(400).send({ message: err.message });
+        next(new BadRequestError('Некорректный _id'));
       } else if (err instanceof mongoose.Error.DocumentNotFoundError) {
-        res.status(404).send({ message: 'Пользователь с указанным _id не найден.' });
+        next(new NotFoundError('Пользователь с указанным _id не найден.'));
       } else {
-        res.status(500).send({ message: 'На сервере произошла ошибка' });
+        // res.status(500).send({ message: 'На сервере произошла ошибка' });
+        next(err);
       }
     });
 };
 
 // редактировать инфу юзера
-module.exports.editUserInfo = (req, res) => {
+module.exports.editUserInfo = (req, res, next) => {
   const { name, about } = req.body;
   // if (req.user._id) {
   User.findByIdAndUpdate(req.user._id, { name, about }, { new: 'true', runValidators: true }) // чтобы валидация происходила не только в пост запросах, но и в патч исп runValidators
+    .orFail()
     .then((user) => res.send(user))
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(400).send({ message: err.message });
+      if (err instanceof mongoose.Error.ValidationError) {
+        next(new BadRequestError(err.message));
+      } else if (err instanceof mongoose.Error.DocumentNotFoundError) {
+        next(new NotFoundError('Пользователь с указанным _id не найден.'));
       } else {
-        res.status(500).send({ message: 'На сервере произошла ошибка' });
+        next(err);
       }
     });
-  // } else {
-  //   res.status(500).send({ message: 'На сервере произошла ошибка' });
-  // }
 };
 
 // редактировать аватар юзера
-module.exports.editUserAvatar = (req, res) => {
+module.exports.editUserAvatar = (req, res, next) => {
   const { avatar } = req.body;
-  // if (req.user._id) {
   User.findByIdAndUpdate(req.user._id, { avatar }, { new: 'true', runValidators: true }) // чтобы валидация происходила не только в пост запросах, но и в патч исп runValidators
+    .orFail()
     .then((user) => res.send(user))
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(400).send({ message: err.message });
+      if (err instanceof mongoose.Error.ValidationError) {
+        next(new BadRequestError(err.message));
+      } else if (err instanceof mongoose.Error.DocumentNotFoundError) {
+        next(new NotFoundError('Пользователь с указанным _id не найден.'));
       } else {
-        res.status(500).send({ message: 'На сервере произошла ошибка' });
+        next(err);
       }
     });
-  // } else {
-  //   res.status(500).send({ message: 'На сервере произошла ошибка' });
-  // }
 };
