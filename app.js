@@ -29,9 +29,12 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/users', require('./routes/users'));
+// app.use('/users', require('./routes/users'));
+// app.use('/cards', require('./routes/cards'));
+// app.use('/signup', require('./routes/signup'));
+// app.use('/signin', require('./routes/signin'));
 
-app.use('/cards', require('./routes/cards'));
+app.use('/', require('./routes/index'));
 
 // если запрос идет на неизвестный роут
 app.use('*', (req, res) => {

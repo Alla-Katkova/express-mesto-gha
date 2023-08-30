@@ -1,14 +1,16 @@
 const { default: mongoose } = require('mongoose');
-const User = require('../models/user');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const User = require('../models/user');
 const NotFoundError = require('../errors/NotFoundError');
 const BadRequestError = require('../errors/BadRequestError');
 const ConflictError = require('../errors/ConflictError');
-const jwt = require('jsonwebtoken');
 
 // создать юзера
 module.exports.createUser = (req, res, next) => {
-  const { name, about, avatar, email, password } = req.body;
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
   bcrypt.hash(password, 10)
     .then((hash) => User.create({
       name, about, avatar, email, password: hash,
@@ -18,9 +20,8 @@ module.exports.createUser = (req, res, next) => {
       }))
       .catch((err) => {
         if (err.code === 11000) {
-          next(new ConflictError('Пользователь с таким email уже существует'))
-        }
-        else if (err instanceof mongoose.Error.ValidationError) {
+          next(new ConflictError('Пользователь с таким email уже существует'));
+        } else if (err instanceof mongoose.Error.ValidationError) {
           next(new BadRequestError(err.message));
         } else {
           next(err);
@@ -86,5 +87,17 @@ module.exports.editUserAvatar = (req, res, next) => {
       } else {
         next(err);
       }
+    });
+};
+
+module.exports.login = (req, res, next) => {
+  const { email, password } = req.body;
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
+      res.send({ token });
+    })
+    .catch((err) => {
+      next(err);
     });
 };
