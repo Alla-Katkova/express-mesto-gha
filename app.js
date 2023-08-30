@@ -13,22 +13,6 @@ mongoose.connect(DB_URL, {
   useUnifiedTopology: true,
 });
 
-// app.listen(PORT, () => {
-//   console.log('3000 портик');
-// });
-
-// app.get('/', (req, res) => {
-//   res.send('HI')
-// })
-
-app.use((req, res, next) => {
-  req.user = {
-    _id: '64e4efa4e067a30199a3b9aa', // вставьте сюда _id созданного в предыдущем пункте пользователя
-  };
-
-  next();
-});
-
 // app.use('/users', require('./routes/users'));
 // app.use('/cards', require('./routes/cards'));
 // app.use('/signup', require('./routes/signup'));

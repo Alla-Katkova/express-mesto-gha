@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const {
   getUsersFromDB,
+  getMyUserInfo,
   getUserById,
   editUserInfo,
   editUserAvatar,
@@ -8,6 +9,8 @@ const {
 
 // возвращает всех пользователей
 router.get('/', getUsersFromDB);
+// роут для получения информации о пользователе
+router.get('/me', getMyUserInfo);
 // возвращает пользователя по _id
 router.get('/:userId', getUserById);
 // создаёт пользователя
