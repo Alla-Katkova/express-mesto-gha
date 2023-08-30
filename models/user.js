@@ -31,7 +31,8 @@ const userSchema = new mongoose.Schema({
     unique: true,
     validate: {
       validator(email) {
-        validator.isEmail(email);
+      return validator.isEmail(email);
+       // return /^\S+@\S+\.\S+$/.test(email);
       },
       message: 'Введите верный email или пароль',
     },

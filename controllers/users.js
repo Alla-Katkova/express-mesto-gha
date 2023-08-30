@@ -1,20 +1,31 @@
 const { default: mongoose } = require('mongoose');
 const User = require('../models/user');
+const bcrypt = require('bcryptjs');
 const NotFoundError = require('../errors/NotFoundError');
 const BadRequestError = require('../errors/BadRequestError');
+const ConflictError = require('../errors/ConflictError');
+const jwt = require('jsonwebtoken');
 
 // создать юзера
 module.exports.createUser = (req, res, next) => {
-  const { name, about, avatar } = req.body;
-  User.create({ name, about, avatar })
-    .then((user) => res.status(201).send(user))
-    .catch((err) => {
-      if (err instanceof mongoose.Error.ValidationError) {
-        next(new BadRequestError(err.message));
-      } else {
-        next(err);
-      }
-    });
+  const { name, about, avatar, email, password } = req.body;
+  bcrypt.hash(password, 10)
+    .then((hash) => User.create({
+      name, about, avatar, email, password: hash,
+    })
+      .then((user) => res.status(201).send({
+        name: user.name, about: user.about, avatar: user.avatar, _id: user._id, email: user.email,
+      }))
+      .catch((err) => {
+        if (err.code === 11000) {
+          next(new ConflictError('Пользователь с таким email уже существует'))
+        }
+        else if (err instanceof mongoose.Error.ValidationError) {
+          next(new BadRequestError(err.message));
+        } else {
+          next(err);
+        }
+      }));
 };
 
 // вывести список юзера
