@@ -2,6 +2,7 @@ const { default: mongoose } = require('mongoose');
 const Card = require('../models/card');
 const NotFoundError = require('../errors/NotFoundError');
 const BadRequestError = require('../errors/BadRequestError');
+const ForbiddenError = require('../errors/ForbiddenError');
 
 // создать карточки
 module.exports.createCard = (req, res, next) => {
@@ -29,21 +30,53 @@ module.exports.getCardsFromDB = (req, res, next) => {
 
 // удалить карточку
 module.exports.deleteCard = (req, res, next) => {
-  Card.findByIdAndRemove(req.params.cardId)
-    .orFail()
-    .then(() => {
-      res.send({ message: 'Карточка успешно удалена' });
+  Card.findById(req.params.cardId)
+    .then((card) => {
+      if (!card.owner.equals(req.user._id)) {
+        throw new ForbiddenError('Удаление карточки другого пользователя запрещено');
+      }
+      Card.deleteOne(card)
+        .orFail()
+        .then(() => {
+          res.send({ message: 'Карточка успешно удалена' });
+        })
+        .catch((err) => {
+          if (err instanceof mongoose.Error.CastError) {
+            next(new BadRequestError('Некорректный _id'));
+          } else if (err instanceof mongoose.Error.DocumentNotFoundError) {
+            next(new NotFoundError('Пользователь с указанным _id не найден.'));
+          } else {
+            next(err);
+          }
+        });
     })
     .catch((err) => {
-      if (err instanceof mongoose.Error.CastError) {
-        next(new BadRequestError('Некорректный _id'));
-      } else if (err instanceof mongoose.Error.DocumentNotFoundError) {
-        next(new NotFoundError('Пользователь с указанным _id не найден.'));
-      } else {
-        next(err);
-      }
-    });
-};
+    if (err.name === 'TypeError') {
+      next(new NotFoundError('Пользователь с указанным _id не найден.'));
+    } else {
+      next(err);
+    }
+  });
+}
+
+// module.exports.deleteCard = (req, res, next) => {
+
+//     const card = Card.findById(req.params.cardId);
+//     if (!card) {
+//       return next(new NotFoundError('Карточка с таким ID не найдена'));
+//     }
+
+//     if (card.owner.toString() !== req.user._id) {
+//       return next(new ForbiddenErr('Нет доступа'));
+//     }
+
+//     Card.deleteOne(card._id);
+//     return res.send(card);
+//   } catch (err) {
+//     return next(err);
+//   }
+// ;
+
 
 // поставить лайк на карточку
 module.exports.likeCard = (req, res, next) => {
