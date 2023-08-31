@@ -51,13 +51,13 @@ module.exports.deleteCard = (req, res, next) => {
         });
     })
     .catch((err) => {
-    if (err.name === 'TypeError') {
-      next(new NotFoundError('Пользователь с указанным _id не найден.'));
-    } else {
-      next(err);
-    }
-  });
-}
+      if (err.name === 'TypeError') {
+        next(new NotFoundError('Пользователь с указанным _id не найден.'));
+      } else {
+        next(err);
+      }
+    });
+};
 
 // поставить лайк на карточку
 module.exports.likeCard = (req, res, next) => {

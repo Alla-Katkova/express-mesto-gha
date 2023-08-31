@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const express = require('express');
 const bodyParser = require('body-parser');
+const { errors } = require('celebrate');
 
 const { PORT = 3000, DB_URL = 'mongodb://127.0.0.1:27017/mestodb' } = process.env;
 const app = express();
@@ -13,11 +14,7 @@ mongoose.connect(DB_URL, {
   useUnifiedTopology: true,
 });
 
-// app.use('/users', require('./routes/users'));
-// app.use('/cards', require('./routes/cards'));
-// app.use('/signup', require('./routes/signup'));
-// app.use('/signin', require('./routes/signin'));
-
+// общий роут для карточек юзеров сайнапа и сайнина
 app.use('/', require('./routes/index'));
 
 // если запрос идет на неизвестный роут
@@ -25,8 +22,10 @@ app.use('*', (req, res) => {
   res.status(404).send({ message: 'Страница не найдена' });
 });
 
-// централизация ошибок
+// петрушка, чтобы работал celebrate
+app.use(errors());
 
+// централизация ошибок
 app.use((err, req, res, next) => {
   const { statusCode = 500, message } = err;
   res

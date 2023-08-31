@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const UnAutorizedError = require('../errors/UnAuthtorizedError');
-const urlRegex = require('../utils/constants')
+const urlRegex = require('../utils/constants');
 
 // Опишем схему:
 const userSchema = new mongoose.Schema({
