@@ -59,25 +59,6 @@ module.exports.deleteCard = (req, res, next) => {
   });
 }
 
-// module.exports.deleteCard = (req, res, next) => {
-
-//     const card = Card.findById(req.params.cardId);
-//     if (!card) {
-//       return next(new NotFoundError('Карточка с таким ID не найдена'));
-//     }
-
-//     if (card.owner.toString() !== req.user._id) {
-//       return next(new ForbiddenErr('Нет доступа'));
-//     }
-
-//     Card.deleteOne(card._id);
-//     return res.send(card);
-//   } catch (err) {
-//     return next(err);
-//   }
-// ;
-
-
 // поставить лайк на карточку
 module.exports.likeCard = (req, res, next) => {
   Card.findByIdAndUpdate(req.params.cardId, { $addToSet: { likes: req.user._id } }, { new: true })
