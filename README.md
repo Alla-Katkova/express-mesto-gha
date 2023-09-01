@@ -1,5 +1,7 @@
 # Проект Mesto фронтенд + бэкенд
 [![Ссылка на сайт](../../actions/workflows/tests-13-sprint.yml/badge.svg)]
+[![Ссылка на репозиторий](https://github.com/Alla-Katkova/express-mesto-gha.git)]
+
 
 ## Директории
 
