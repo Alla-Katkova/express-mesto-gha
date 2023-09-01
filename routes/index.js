@@ -16,7 +16,7 @@ router.use('/cards', cardsRouter);
 
 // если запрос идет на неизвестный роут
 router.use('*', (req, res, next) => {
-  next(new NotFoundError('Страница не найдена' )) ;
+  next(new NotFoundError('Страница не найдена'));
 });
 
 module.exports = router;
